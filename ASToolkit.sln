@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASToolkit.Storage", "ASToolkit.Storage\ASToolkit.Storage.csproj", "{EB8D2712-75C8-404E-8BE6-2939DD80CAE5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{0CC91EFF-AC64-426D-9FF7-60AD86CAE606}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "System", "System", "{1E4AA938-657E-446D-BC70-81922D7EE6CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASToolkit.Storage.System", "ASToolkit.Storage.System\ASToolkit.Storage.System.csproj", "{0F185037-3881-4365-88D7-28CA9900C1C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASToolkit.Storage.SystemTests", "ASToolkit.Storage.SystemTests\ASToolkit.Storage.SystemTests.csproj", "{3EA80E94-C096-44EB-BFE6-49426CE03516}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EB8D2712-75C8-404E-8BE6-2939DD80CAE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB8D2712-75C8-404E-8BE6-2939DD80CAE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB8D2712-75C8-404E-8BE6-2939DD80CAE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB8D2712-75C8-404E-8BE6-2939DD80CAE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F185037-3881-4365-88D7-28CA9900C1C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F185037-3881-4365-88D7-28CA9900C1C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F185037-3881-4365-88D7-28CA9900C1C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F185037-3881-4365-88D7-28CA9900C1C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EA80E94-C096-44EB-BFE6-49426CE03516}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EA80E94-C096-44EB-BFE6-49426CE03516}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EA80E94-C096-44EB-BFE6-49426CE03516}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EA80E94-C096-44EB-BFE6-49426CE03516}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EB8D2712-75C8-404E-8BE6-2939DD80CAE5} = {0CC91EFF-AC64-426D-9FF7-60AD86CAE606}
+		{1E4AA938-657E-446D-BC70-81922D7EE6CC} = {0CC91EFF-AC64-426D-9FF7-60AD86CAE606}
+		{0F185037-3881-4365-88D7-28CA9900C1C2} = {1E4AA938-657E-446D-BC70-81922D7EE6CC}
+		{3EA80E94-C096-44EB-BFE6-49426CE03516} = {1E4AA938-657E-446D-BC70-81922D7EE6CC}
+	EndGlobalSection
+EndGlobal
