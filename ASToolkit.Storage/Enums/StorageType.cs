@@ -2,5 +2,6 @@
 
 public enum StorageType
 {
-    System
+    System,
+    Azure
 }
