@@ -28,7 +28,7 @@ public class CsvParserTests
         var parser = new CsvParser();
 
         var result = parser.Parse<Person>(stream);
-
+        Assert.NotNull(result);
         Assert.Equal(2, result.Count);
         Assert.Equal("John", result[0].Name);
         Assert.Equal(30, result[0].Age);
@@ -65,6 +65,7 @@ public class CsvParserTests
 
         var result = parser.Parse<Person>(stream);
 
+        Assert.NotNull(result);
         Assert.Empty(result);
     }
 

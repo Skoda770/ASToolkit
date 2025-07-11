@@ -10,14 +10,14 @@ namespace ASToolkit.Parsing.Csv;
 
 public class CsvParser : ParserBase, IParser<CsvParserConfig>
 {
-    private CsvParserConfig _config;
+    private CsvParserConfig? _config;
     public void SetConfig(CsvParserConfig config)
     {
         _config = config;
     }
 
     public override ParserType Type => ParserType.Csv;
-    public override List<T>? Parse<T>(Stream stream)
+    public override List<T> Parse<T>(Stream stream)
     {
         using var reader = new StreamReader(stream);
         var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)

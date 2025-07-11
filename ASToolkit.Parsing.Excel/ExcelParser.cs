@@ -18,7 +18,7 @@ public class ExcelParser : ParserBase, IParser<ExcelParserConfig>
     }
 
     public override ParserType Type => ParserType.Excel;
-    public override List<T>? Parse<T>(Stream stream)
+    public override List<T> Parse<T>(Stream stream)
     {
         throw new NotImplementedException();
     }

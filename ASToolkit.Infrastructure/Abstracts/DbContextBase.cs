@@ -28,7 +28,7 @@ public abstract class DbContextBase(DbContextOptions options) : DbContext(option
 
     private static bool InheritsFromGenericAuditable(Type type)
     {
-        while (type != null && type != typeof(object))
+        while (type != typeof(object))
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(AuditableEntityBase<>))
                 return true;
