@@ -3,5 +3,6 @@
 public enum StorageType
 {
     System,
+    AppData,
     Azure
 }
