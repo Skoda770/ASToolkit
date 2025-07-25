@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace ASToolkit.Parsing.Infrastructure;
+namespace ASToolkit.Parsing.Core.Infrastructure;
 
 public class ParserBuilder(IServiceCollection services)
 {

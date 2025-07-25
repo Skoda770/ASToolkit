@@ -11,6 +11,7 @@
 
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="6.0.0"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
         <PackageReference Include="xunit" Version="2.5.3"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3"/>
@@ -22,7 +23,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ASToolkit.Parsing.Excel\ASToolkit.Parsing.Excel.csproj" />
-      <ProjectReference Include="..\ASToolkit.Parsing\ASToolkit.Parsing.csproj" />
+      <ProjectReference Include="..\ASToolkit.Parsing.Core\ASToolkit.Parsing.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

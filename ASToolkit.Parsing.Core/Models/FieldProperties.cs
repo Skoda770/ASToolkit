@@ -1,4 +1,4 @@
-﻿namespace ASToolkit.Parsing.Models;
+﻿namespace ASToolkit.Parsing.Core.Models;
 
 public record FieldProperties
 {

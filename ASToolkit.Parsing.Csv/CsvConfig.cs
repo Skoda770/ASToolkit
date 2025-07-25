@@ -1,6 +1,6 @@
 ﻿namespace ASToolkit.Parsing.Csv;
 
-public class CsvParserConfig
+public class CsvConfig
 {
     public char Delimiter { get; set; } = ',';
 }

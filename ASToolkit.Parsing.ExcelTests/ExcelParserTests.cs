@@ -26,6 +26,20 @@ public class ExcelParserTests
         Assert.Throws<ArgumentException>(() =>
             parser.Parse(File.ReadAllBytes("sample_test_file.xls")));
     }
+    [Fact]
+    public void ParseT_XlsFile_ValidData()
+    {
+        var parser = new ExcelParser();
+        
+        var data = parser.Parse<Figure>(File.ReadAllBytes("sample_test_file.xls"));
+        
+        Assert.NotNull(data);
+        Assert.Equal(3, data.Count);
+        Assert.Equal("Circle", data[0].Shape);
+        Assert.Equal("Producer A", data[0].Producer);
+        Assert.Equal("Triangle", data[2].Shape);
+        Assert.Equal("Producer C", data[2].Producer);
+    }
 
     [Theory]
     [InlineData("sample_test_file.xls", new[] { "Shape", "Producer", "Description", "Name" })]

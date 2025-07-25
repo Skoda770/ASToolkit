@@ -1,6 +1,6 @@
-﻿using ASToolkit.Parsing.Abstracts;
-using ASToolkit.Parsing.Enums;
-using ASToolkit.Parsing.Models;
+﻿using ASToolkit.Parsing.Core.Abstracts;
+using ASToolkit.Parsing.Core.Enums;
+using ASToolkit.Parsing.Core.Models;
 using Newtonsoft.Json;
 
 namespace ASToolkit.Parsing.Json;

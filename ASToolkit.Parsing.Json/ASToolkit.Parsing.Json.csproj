@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ASToolkit.Parsing\ASToolkit.Parsing.csproj" />
+      <ProjectReference Include="..\ASToolkit.Parsing.Core\ASToolkit.Parsing.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,7 +1,7 @@
-﻿using ASToolkit.Parsing.Enums;
-using ASToolkit.Parsing.Models;
+﻿using ASToolkit.Parsing.Core.Enums;
+using ASToolkit.Parsing.Core.Models;
 
-namespace ASToolkit.Parsing.Interfaces;
+namespace ASToolkit.Parsing.Core.Interfaces;
 
 public interface IParser
 {

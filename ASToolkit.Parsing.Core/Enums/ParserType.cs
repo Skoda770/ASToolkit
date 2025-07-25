@@ -1,4 +1,4 @@
-﻿namespace ASToolkit.Parsing.Enums;
+﻿namespace ASToolkit.Parsing.Core.Enums;
 
 public enum ParserType
 {

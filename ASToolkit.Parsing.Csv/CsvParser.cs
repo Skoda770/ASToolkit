@@ -1,17 +1,17 @@
 ﻿using System.Globalization;
-using ASToolkit.Parsing.Abstracts;
-using ASToolkit.Parsing.Enums;
-using ASToolkit.Parsing.Interfaces;
-using ASToolkit.Parsing.Models;
+using ASToolkit.Parsing.Core.Abstracts;
+using ASToolkit.Parsing.Core.Enums;
+using ASToolkit.Parsing.Core.Interfaces;
+using ASToolkit.Parsing.Core.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
 
 namespace ASToolkit.Parsing.Csv;
 
-public class CsvParser : ParserBase, IParser<CsvParserConfig>
+public class CsvParser : ParserBase, IParser<CsvConfig>
 {
-    private CsvParserConfig? _config;
-    public void SetConfig(CsvParserConfig config)
+    private CsvConfig? _config;
+    public void SetConfig(CsvConfig config)
     {
         _config = config;
     }

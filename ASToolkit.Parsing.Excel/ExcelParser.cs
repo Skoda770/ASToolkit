@@ -1,33 +1,42 @@
-﻿using ASToolkit.Parsing.Abstracts;
-using ASToolkit.Parsing.Enums;
+﻿using System.Dynamic;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using ASToolkit.Parsing.Core.Abstracts;
+using ASToolkit.Parsing.Core.Enums;
+using ASToolkit.Parsing.Core.Interfaces;
+using ASToolkit.Parsing.Core.Models;
 using ASToolkit.Parsing.Excel.Extensions;
-using ASToolkit.Parsing.Interfaces;
-using ASToolkit.Parsing.Models;
 using NPOI.HSSF.Record.AutoFilter;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 
 namespace ASToolkit.Parsing.Excel;
 
 public class ExcelParser : ParserBase, IParser<ExcelParserConfig>
 {
     private ExcelParserConfig _config = new();
+
     public void SetConfig(ExcelParserConfig config)
     {
         _config = config;
     }
 
     public override ParserType Type => ParserType.Excel;
+
     public override List<T> Parse<T>(Stream stream)
     {
-        throw new NotImplementedException();
+        var json = JsonSerializer.Serialize(Parse(stream));
+        var result = JsonSerializer.Deserialize<List<T>>(json)
+                     ?? throw new InvalidOperationException("Failed to deserialize Excel data to the specified type.");
+        return result;
     }
 
     public override List<Dictionary<string, object?>> Parse(Stream stream)
     {
         var worksheet = GetExcelWorksheet(stream);
         PrepareConfigWithWorksheet(worksheet);
-        var result = GetRows(worksheet,_config.CustomRowsIndexes);
+        var result = GetRows(worksheet, _config.CustomRowsIndexes);
 
         return result;
     }
@@ -36,11 +45,14 @@ public class ExcelParser : ParserBase, IParser<ExcelParserConfig>
     {
         _config.StartRow--;
         _config.StartColumn--; // NPOI uses 0-based index for rows and columns
-        _config.EndColumn ??= GetTableColumnDimension(worksheet, _config.StartColumn, _config.StartRow) + _config.StartColumn;
+        _config.EndColumn ??= GetTableColumnDimension(worksheet, _config.StartColumn, _config.StartRow) +
+                              _config.StartColumn;
         _config.EndRow ??= _config.StartRow + GetRowsCount(worksheet);
         _config.ExcelColumns ??= GetTableHeader(worksheet);
-        _config.CustomRowsIndexes ??= [..Enumerable.Range(_config.StartRow + 1, _config.EndRow.Value - _config.StartRow)];
+        _config.CustomRowsIndexes ??=
+            [..Enumerable.Range(_config.StartRow + 1, _config.EndRow.Value - _config.StartRow)];
     }
+
     private List<Dictionary<string, object?>> GetRows(ISheet worksheet, HashSet<int>? rowsIndexes)
     {
         var result = new List<Dictionary<string, object?>>();
@@ -73,6 +85,7 @@ public class ExcelParser : ParserBase, IParser<ExcelParserConfig>
 
         return result;
     }
+
     private int GetRowsCount(ISheet worksheet)
     {
         var count = 0;
@@ -85,7 +98,7 @@ public class ExcelParser : ParserBase, IParser<ExcelParserConfig>
             var customRowsIndexes = new HashSet<int>();
             for (var i = _config.StartRow;
                  i <= dimensionRows;
-                 i++) 
+                 i++)
             {
                 var row = sheet!.GetRow(i);
                 if (IsNullExcelRow(worksheet, row) ||
@@ -93,6 +106,7 @@ public class ExcelParser : ParserBase, IParser<ExcelParserConfig>
                     continue;
                 customRowsIndexes.Add(i);
             }
+
             _config.CustomRowsIndexes = customRowsIndexes;
             return customRowsIndexes.Count;
         }
@@ -108,6 +122,7 @@ public class ExcelParser : ParserBase, IParser<ExcelParserConfig>
         count -= 1;
         return count < 0 ? 0 : count;
     }
+
     private bool IsNullExcelRow(ISheet worksheet, IRow? row)
     {
         if (row is null) return true;
@@ -119,9 +134,10 @@ public class ExcelParser : ParserBase, IParser<ExcelParserConfig>
             return cell.GetCellValue() is not null && !isColumnHidden && colStyle?.IsHidden != true;
         });
     }
+
     private ISheet GetExcelWorksheet(Stream stream)
     {
-        var workbook = new HSSFWorkbook(stream);
+        var workbook = GetWorkbook(stream);
         var worksheet = string.IsNullOrEmpty(_config.Sheet) ? workbook.GetSheetAt(0) : workbook.GetSheet(_config.Sheet);
 
         if (worksheet == null)
@@ -129,10 +145,26 @@ public class ExcelParser : ParserBase, IParser<ExcelParserConfig>
 
         return worksheet;
     }
+
+    private static IWorkbook GetWorkbook(Stream stream)
+    {
+        var ms = new MemoryStream();
+        stream.CopyTo(ms);
+        ms.Position = 0;
+        try
+        {
+            return new HSSFWorkbook(new MemoryStream(ms.ToArray()));
+        }
+        catch
+        {
+            return new XSSFWorkbook(new MemoryStream(ms.ToArray()));
+        }
+    }
+
     private bool IsTableHasFilter(ISheet worksheet, int dimensionRows)
     {
         if (worksheet is not HSSFSheet sheet) return false;
-        
+
         var filterExists = sheet.Sheet.Records.Exists(record => record is AutoFilterInfoRecord);
         if (!filterExists) return false;
         for (var i = _config.StartRow; i <= dimensionRows; i++)
@@ -144,10 +176,12 @@ public class ExcelParser : ParserBase, IParser<ExcelParserConfig>
 
         return false;
     }
+
     private static int GetTableColumnDimension(ISheet worksheet, int startColumn, int startRow)
     {
         return worksheet.GetRow(startRow).LastCellNum - (startColumn + 1);
     }
+
     private Dictionary<int, List<ICell>> GetColumns(ISheet worksheet)
     {
         var result = new Dictionary<int, List<ICell>>();
@@ -168,6 +202,7 @@ public class ExcelParser : ParserBase, IParser<ExcelParserConfig>
 
         return result.Where(e => e.Value.Count != 0).ToDictionary(e => e.Key, e => e.Value);
     }
+
     public override List<FieldProperties> GetFieldsProperties(Stream stream)
     {
         var worksheet = GetExcelWorksheet(stream);
@@ -180,14 +215,16 @@ public class ExcelParser : ParserBase, IParser<ExcelParserConfig>
             var filledCells = col.Value.Where(cell => !cell.IsNullOrEmpty()).ToList();
             return new FieldProperties()
             {
-                Key =  col.Key,
+                Key = col.Key,
                 Name = worksheet.GetRow(_config.StartRow).GetCell(col.Key).GetCellValue()?.ToString(),
                 LongestValueLength = filledCells.Max(cell => cell.GetCellValue()?.ToString()?.Length) ?? 0,
                 LongestValue = filledCells.OrderByDescending(cell => cell.GetCellValue()?.ToString()?.Length)
                     .FirstOrDefault()?.GetCellValue()?.ToString(),
                 IsAllCellsFilled = filledCells.Count == col.Value.Count,
-                IsAllCellsInteger = filledCells.TrueForAll(cell => int.TryParse(cell.GetCellValue()?.ToString(), out _)),
-                IsAllCellsNumber = filledCells.TrueForAll(cell => decimal.TryParse(cell.GetCellValue()?.ToString(), out _)),
+                IsAllCellsInteger =
+                    filledCells.TrueForAll(cell => int.TryParse(cell.GetCellValue()?.ToString(), out _)),
+                IsAllCellsNumber =
+                    filledCells.TrueForAll(cell => decimal.TryParse(cell.GetCellValue()?.ToString(), out _)),
                 IsAllCellsBool = filledCells.TrueForAll(cell => bool.TryParse(cell.GetCellValue()?.ToString(), out _))
             };
         }).ToList();

@@ -1,7 +1,7 @@
-﻿using ASToolkit.Parsing.Enums;
-using ASToolkit.Parsing.Interfaces;
+﻿using ASToolkit.Parsing.Core.Enums;
+using ASToolkit.Parsing.Core.Interfaces;
 
-namespace ASToolkit.Parsing.Infrastructure;
+namespace ASToolkit.Parsing.Core.Infrastructure;
 
 public class ParserFactory(IEnumerable<IParser> parsers)
 {
