@@ -1,4 +1,4 @@
-﻿namespace ASToolkit.Communication.Interfaces;
+﻿namespace ASToolkit.Communication.Core.Interfaces;
 
 public interface INotifiable
 {

@@ -1,5 +1,6 @@
 ﻿using System.Net.Mail;
 using ASToolkit.Communication.Email.Interfaces;
+using ASToolkit.Communication.Email.Models;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Wrap;
@@ -8,8 +9,7 @@ namespace ASToolkit.Communication.Email.Services;
 
 public class EmailSender : IEmailSender
 {
-    private SmtpClient? _smtpClient;
-    private IEmailSenderConfig? _emailConfig;
+    protected ISmtpClient? SmtpClient;
     private readonly AsyncPolicyWrap _asyncPolicy;
     private readonly PolicyWrap _syncPolicy;
     private readonly ILogger<EmailSender> _logger;
@@ -49,61 +49,75 @@ public class EmailSender : IEmailSender
                     onFallback: (ex) => { logger.LogError(ex, "Failed to send email after retries."); }));
     }
 
-    public void SetSettings(IEmailSenderConfig emailSenderConfig)
+    public virtual void SetSettings(IEmailSenderConfig emailSenderConfig)
     {
-        _emailConfig = emailSenderConfig;
-        _smtpClient = new(emailSenderConfig.SmtpServer, emailSenderConfig.SmtpPort)
+        SmtpClient = new SmtpClientWrapper(emailSenderConfig);
+    }
+
+    private bool IsValidSmtpClient()
+    {
+        if (SmtpClient is not null) return true;
+        _logger.LogWarning("SMTP client is not set. Please set the SMTP client before sending emails.");
+        return false;
+    }
+    private bool IsValidMailMessage(MailMessage message)
+    {
+        var isValid = true;
+        if (message.From is null)
         {
-            Credentials = new System.Net.NetworkCredential(emailSenderConfig.Username, emailSenderConfig.Password),
-            EnableSsl = emailSenderConfig.UseSsl
-        };
+            _logger.LogWarning("From address is not set.");
+            isValid = false;
+        }
+        if (message.To.Count == 0)
+        {
+            _logger.LogWarning("At least one To address must be set.");
+            isValid = false;
+        }
+        return isValid;
     }
-
-    private void CheckSmtpClient()
-    {
-        if (_smtpClient is null)
-            throw new InvalidOperationException("SMTP client is not configured. Call SetSettings first.");
-    }
-
-    private void CheckMailMessage(MailMessage message)
-    {
-        if (message.From is not null) return;
-        _logger.LogWarning("From address is null. Set config email as from address.");
-        message.From = _emailConfig!.SenderName is not null ? new MailAddress(_emailConfig.SenderEmail, _emailConfig.SenderName) : new MailAddress(_emailConfig.SenderEmail);
-    }
-
     public void SendEmail(MailMessage message)
     {
-        CheckSmtpClient();
-        CheckMailMessage(message);
-        _syncPolicy.Execute(() => _smtpClient!.Send(message));
+        if (!IsValidSmtpClient() || !IsValidMailMessage(message))
+            return;
+        _syncPolicy.Execute(() => SmtpClient!.Send(message));
+        _logger.LogInformation("Email sent successfully to {ToAddresses}.", string.Join(", ", message.To.Select(t => t.Address)));
     }
 
     public void SendBulkEmail(IEnumerable<MailMessage> messages)
     {
-        CheckSmtpClient();
+        if (!IsValidSmtpClient())
+            return;
         foreach (var message in messages)
         {
-            CheckMailMessage(message);
-            _syncPolicy.Execute(() => _smtpClient!.Send(message));
+            if (!IsValidMailMessage(message))
+                continue;
+            _syncPolicy.Execute(() => SmtpClient!.Send(message));
+            _logger.LogInformation("Email sent successfully to {ToAddresses}.", string.Join(", ", message.To.Select(t => t.Address)));
         }
     }
 
     public async Task SendEmailAsync(MailMessage message)
     {
-        CheckSmtpClient();
-        CheckMailMessage(message);
-        await _asyncPolicy.ExecuteAsync(async () => await _smtpClient!.SendMailAsync(message));
+        if (!IsValidSmtpClient() || !IsValidMailMessage(message))
+            return;
+        await _asyncPolicy.ExecuteAsync(async () => await SmtpClient!.SendMailAsync(message));
+        _logger.LogInformation("Email sent successfully to {ToAddresses}.", string.Join(", ", message.To.Select(t => t.Address)));
     }
 
     public async Task SendBulkEmailAsync(IEnumerable<MailMessage> messages)
     {
-        CheckSmtpClient();
+        if (!IsValidSmtpClient())
+            return;
 
         var tasks = messages.Select(message =>
         {
-            CheckMailMessage(message);
-            return _asyncPolicy.ExecuteAsync(async () => await _smtpClient!.SendMailAsync(message));
+            return _asyncPolicy.ExecuteAsync(async () =>
+            {
+                if (!IsValidMailMessage(message))
+                    return;
+                await SmtpClient!.SendMailAsync(message);
+                _logger.LogInformation("Email sent successfully to {ToAddresses}.", string.Join(", ", message.To.Select(t => t.Address)));
+            });
         });
 
         await Task.WhenAll(tasks);

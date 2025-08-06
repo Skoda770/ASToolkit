@@ -1,5 +1,5 @@
 using System.Net.Mail;
-using ASToolkit.Communication.Interfaces;
+using ASToolkit.Communication.Core.Interfaces;
 
 namespace ASToolkit.Communication.Email.Models;
 

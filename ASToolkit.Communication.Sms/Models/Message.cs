@@ -1,4 +1,4 @@
-using ASToolkit.Communication.Interfaces;
+using ASToolkit.Communication.Core.Interfaces;
 using ASToolkit.Communication.Sms.Enums;
 
 namespace ASToolkit.Communication.Sms.Models;

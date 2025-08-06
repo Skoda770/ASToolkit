@@ -7,7 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.6" />
+      <ProjectReference Include="..\ASToolkit.Communication.Core\ASToolkit.Communication.Core.csproj" />
+      <ProjectReference Include="..\ASToolkit.Communication.Email\ASToolkit.Communication.Email.csproj" />
+      <ProjectReference Include="..\ASToolkit.Communication.Sms.Twilio\ASToolkit.Communication.Sms.Twilio.csproj" />
+      <ProjectReference Include="..\ASToolkit.Communication.Sms\ASToolkit.Communication.Sms.csproj" />
     </ItemGroup>
 
 </Project>

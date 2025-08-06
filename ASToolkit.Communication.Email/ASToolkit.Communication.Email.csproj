@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ASToolkit.Communication\ASToolkit.Communication.csproj" />
+      <ProjectReference Include="..\ASToolkit.Communication.Core\ASToolkit.Communication.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

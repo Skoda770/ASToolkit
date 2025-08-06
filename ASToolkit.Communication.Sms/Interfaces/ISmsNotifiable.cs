@@ -1,4 +1,4 @@
-using ASToolkit.Communication.Interfaces;
+using ASToolkit.Communication.Core.Interfaces;
 
 namespace ASToolkit.Communication.Sms.Interfaces;
 

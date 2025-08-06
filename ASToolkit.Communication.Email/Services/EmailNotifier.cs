@@ -1,16 +1,15 @@
 using System.Net.Mail;
-using ASToolkit.Communication.Abstracts;
+using ASToolkit.Communication.Core.Abstracts;
 using ASToolkit.Communication.Email.Interfaces;
 using ASToolkit.Communication.Email.Models;
-using ASToolkit.Communication.Interfaces;
+using ASToolkit.Communication.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace ASToolkit.Communication.Email.Services;
 
-public class EmailNotifier(ILogger<INotifier> logger, EmailSender emailSender)
+public class EmailNotifier(ILogger<INotifier> logger, IEmailSender emailSender)
     : NotifierBase<IEmailNotifiable, Message>(logger)
 {
-    private Message? _message;
     private readonly ILogger<INotifier> _logger = logger;
 
     public override async Task Notify(IEmailNotifiable notifiable)
@@ -24,12 +23,12 @@ public class EmailNotifier(ILogger<INotifier> logger, EmailSender emailSender)
         var parameters = notifiable.GetParameters();
         var mailMessage = new MailMessage
         {
-            Subject = ((INotifier)this).ModifyText(_message!.Subject, parameters),
-            Body = ((INotifier)this).ModifyText(_message!.Body, parameters),
+            Subject = ((INotifier)this).ModifyText(Message!.Subject, parameters),
+            Body = ((INotifier)this).ModifyText(Message!.Body, parameters),
             IsBodyHtml = true
         };
         mailMessage.To.Add(new MailAddress(notifiable.Email));
-        foreach (var attachment in _message?.Attachments ?? Enumerable.Empty<Attachment>())
+        foreach (var attachment in Message?.Attachments ?? Enumerable.Empty<Attachment>())
             mailMessage.Attachments.Add(attachment);
 
         await emailSender.SendEmailAsync(mailMessage);
@@ -37,12 +36,12 @@ public class EmailNotifier(ILogger<INotifier> logger, EmailSender emailSender)
 
     private void CheckMessage()
     {
-        if (_message == null)
+        if (Message == null)
             throw new InvalidOperationException("Message is not set. Please set the message before notifying.");
     }
 
     public override void SetMessage(Message message)
     {
-        _message = message;
+        Message = message;
     }
 }

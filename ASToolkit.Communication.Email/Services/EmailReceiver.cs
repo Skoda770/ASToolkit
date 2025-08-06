@@ -1,4 +1,5 @@
-﻿using ASToolkit.Communication.Email.Interfaces;
+﻿using ASToolkit.Communication.Core.Interfaces;
+using ASToolkit.Communication.Email.Interfaces;
 using MailKit;
 using MailKit.Net.Imap;
 using MailKit.Search;
