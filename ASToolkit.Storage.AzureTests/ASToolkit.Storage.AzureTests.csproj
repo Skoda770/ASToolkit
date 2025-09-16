@@ -5,7 +5,7 @@
     
     <IsPackable>false</IsPackable>
     
-    <RootNamespace>ASToolkit.Storage.DesktopTests</RootNamespace>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ASToolkit.Storage.AppData\ASToolkit.Storage.AppData.csproj" />
+    <ProjectReference Include="..\ASToolkit.Storage.Azure\ASToolkit.Storage.Azure.csproj" />
     <ProjectReference Include="..\ASToolkit.Storage.Tests\ASToolkit.Storage.Tests.csproj" />
   </ItemGroup>
   

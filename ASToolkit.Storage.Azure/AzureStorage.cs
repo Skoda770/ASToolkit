@@ -13,6 +13,10 @@ public class AzureStorage(ILogger<IStorage> logger, StorageOptions storageOption
         new BlobContainerClient(storageOptions.ConnectionString, storageOptions.ContainerName);
 
     public override StorageType Type => StorageType.Azure;
+    public void CreateContainerIfNotExists() => _container.CreateIfNotExists();
+
+    public void DeleteContainerIfExists() => _container.DeleteIfExists();
+
     protected override void CreateFileLogic(string path, byte[] content)
     {
         var client = _container.GetBlobClient(path);
@@ -62,7 +66,6 @@ public class AzureStorage(ILogger<IStorage> logger, StorageOptions storageOption
 
     protected override void CreateDirectoryLogic(string path)
     {
-        // Azure Blob Storage does not have a concept of directories, but we can create a "dummy" blob
         var dummyPath = $"{path}.folder";
         _container.GetBlobClient(dummyPath).Upload(new MemoryStream(new byte[0]), overwrite: true);
     }
@@ -79,6 +82,7 @@ public class AzureStorage(ILogger<IStorage> logger, StorageOptions storageOption
 
     protected override bool IsEmptyDirectoryLogic(string path)
     {
+        path = path.TrimEnd(Path.AltDirectorySeparatorChar) + Path.AltDirectorySeparatorChar;
         return !_container.GetBlobsByHierarchy(prefix: path, delimiter: "/").Any();
     }
 
@@ -114,27 +118,35 @@ public class AzureStorage(ILogger<IStorage> logger, StorageOptions storageOption
         dest.StartCopyFromUri(source.Uri);
     }
 
-    protected override string[] GetFilesInDirectoryLogic(string path, string searchPattern = "", SearchOption searchOption = SearchOption.TopDirectoryOnly)
+    protected override string[] GetFilesInDirectoryLogic(string path, string searchPattern = "",
+        SearchOption searchOption = SearchOption.TopDirectoryOnly)
     {
         var result = new List<string>();
+        path = path.TrimEnd(Path.AltDirectorySeparatorChar) + Path.AltDirectorySeparatorChar;
+        // var blobs = _container.GetBlobsByHierarchy(prefix: path, delimiter: Path.AltDirectorySeparatorChar.ToString());
 
-        foreach (var blob in _container.GetBlobsByHierarchy(prefix: path, delimiter: "/"))
+        foreach (var item in _container.GetBlobsByHierarchy(prefix: path, delimiter: "/"))
         {
-            if (blob.IsBlob && (string.IsNullOrEmpty(searchPattern) || blob.Blob.Name.Contains(searchPattern)))
-                result.Add(blob.Blob.Name);
+            var blobPath = item.Blob.Name;
+            if (item.IsBlob && (string.IsNullOrEmpty(searchPattern) || item.Blob.Name.Contains(searchPattern)))
+                result.Add(blobPath.Replace(Path.AltDirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()));
         }
 
         return result.ToArray();
     }
 
-    protected override string[] GetDirectoriesInDirectoryLogic(string path, string searchPattern = "", SearchOption searchOption = SearchOption.TopDirectoryOnly)
+    protected override string[] GetDirectoriesInDirectoryLogic(string path, string searchPattern = "",
+        SearchOption searchOption = SearchOption.TopDirectoryOnly)
     {
         var result = new List<string>();
-
-        foreach (var item in _container.GetBlobsByHierarchy(prefix: path, delimiter: "/"))
+        path = path.TrimEnd(Path.AltDirectorySeparatorChar) + Path.AltDirectorySeparatorChar;
+        var blobs = _container.GetBlobsByHierarchy(prefix: path, delimiter: Path.AltDirectorySeparatorChar.ToString());
+        foreach (var item in blobs)
         {
-            if (item.IsPrefix && (string.IsNullOrEmpty(searchPattern) || item.Prefix.Contains(searchPattern)))
-                result.Add(item.Prefix);
+            var blobPath = item.Blob.Name;
+            if (blobPath.EndsWith(".folder"))
+                blobPath = blobPath[..^7];
+            result.Add(blobPath.Replace(Path.AltDirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()));
         }
 
         return result.ToArray();

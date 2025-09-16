@@ -23,6 +23,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ASToolkit.Storage.System\ASToolkit.Storage.System.csproj" />
+      <ProjectReference Include="..\ASToolkit.Storage.Tests\ASToolkit.Storage.Tests.csproj" />
       <ProjectReference Include="..\ASToolkit.Storage\ASToolkit.Storage.csproj" />
     </ItemGroup>
 
